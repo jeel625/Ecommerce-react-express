@@ -11,5 +11,15 @@
     width: 200px;
 }
 .nav-profile{
-    width: 75px;
+    width: 90px;
+    height: 70px;
+}
+.profile-arrow{
+    display: flex;
+    gap: 3px;
+    cursor: pointer;
+}
+.nav-down-arrow{
+    width: 100px;
+    padding-top: 20px;
 }
