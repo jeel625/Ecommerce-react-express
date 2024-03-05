@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
+const bcrypt = require('bcrypt');
 const { error } = require("console");
 
 
@@ -79,6 +80,93 @@ const Product = mongoose.model("Product",{
         type:Boolean,
         default:true
     },
+})
+
+// Schema creating for User Model
+
+const Users = mongoose.model("Users",{
+    name:{
+        type:String,
+    },
+    email:{
+        type:String,
+        unique:true,
+    },
+    password:{
+        type:String,
+    },
+    cartData:{
+        type:Object,
+    },
+    date:{
+        type:Date,
+        Default:Date.now(),
+    }
+})
+
+
+// Creating Endpoint for registering the User
+app.post('/signup',async (req,res) => {
+    let check = await Users.findOne({email:req.body.email});
+
+    if(check){
+        return res.status(400).json({success:false,erros:"existing user found with same email address"})
+    }
+
+    let cart = {};
+    for(let i = 0 ; i < 300; i++)
+    {
+        cart[i] = 0;
+    }
+    const user = new Users({
+        name:req.body.username,
+        email:req.body.email,
+        password:req.body.password,
+        cartData:cart,
+    })
+
+    await user.save();
+
+    const data = {
+        user:{
+            id:user.id
+        }
+    }
+
+    const token = jwt.sign(data,'secret_ecom');
+    res.json({success:true,token});
+})
+
+//Creating endpoint for the user login
+
+app.post('/login',async (req,res) => {
+
+    console.log(req.body.password);
+    let user = await Users.findOne({email:req.body.email});
+    
+    if(user){
+        if(user.password){
+            const passCompare = req.body.password === user.password;
+            if(passCompare){
+                const data = {
+                    user:{
+                        id:user.id
+                    }
+                }
+                const token = jwt.sign(data,'secret_ecom') //You have to use the same "secret_ecom" because you have used that in the sing up for creating the tokens.
+                res.json({success:true,token});
+            }
+            else{
+                res.json({success:false,error:"Wrong password"});
+            }
+        }
+        else{
+            res.json({success:false,error:"There is no password for the user"});
+        }
+    }
+    else{
+        res.json({success:false,error:"Wrong Email Id"});
+    }
 })
 
 
