@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import '../AddProduct/AddProduct.css'
 import upload_area from '../../assets/upload_area.svg'
+import { useEffect } from 'react';
 
 export const AddProduct = () => {
 
@@ -22,6 +23,10 @@ export const AddProduct = () => {
             ...productDetails,[e.target.name] : e.target.value
         })
     }
+
+    useEffect(() => {
+
+    },[])
 
     const AddProduct = async () => {
         console.log(productDetails);
@@ -53,6 +58,16 @@ export const AddProduct = () => {
             }).then((resp) => resp.json()).then((data) => {
                 data.success ? alert("Product Added") : alert("Failed")
             })
+
+            //After adding the product we need to clear the input fields
+            setProductDetails({
+                name: "",
+                image: "",
+                category: "women",
+                new_price: "",
+                old_price: ""
+              });
+              setImage(null);
         }
     }
 

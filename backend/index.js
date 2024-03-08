@@ -2,12 +2,12 @@ const port = 4000;
 const express = require("express"); 
 const app = express();
 const mongoose = require("mongoose"); // The id: greatstackdev pass:pateljeel625
-const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken"); 
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 const bcrypt = require('bcrypt');
-const { error } = require("console");
+const { error, log } = require("console");
 
 
 app.use(express.json());
@@ -44,6 +44,50 @@ app.post("/upload",upload.single('product'),(req,res)=>{
     })
 })
 
+//Creating endpoint for the new collection data
+app.get('/newcollections',async (req,res) => {
+    let products = await Product.find({});
+    let newCollection = products.slice(1).slice(-8); // we will get recently added new 8 products in the new colletions
+    console.log("NewCollection Fetched")
+    res.send(newCollection);
+})
+
+// creating the endpoint for popular in women section
+app.get('/popularinwomen',async (req,res) => {
+    let product = await Product.find({category:"women"});
+    let poular_in_women = product.slice(0,4);
+
+    console.log("Popular in women fetched");
+    console.log(poular_in_women);
+    res.send(poular_in_women);
+})
+
+// Creating middleware to fetch the user
+    const fetchuser = async (req,res,next) => {
+        const token = req.header('auth-token');
+        if(!token){
+            res.status(401).send({errors:"Please authenticate using valid token"})
+        }
+        else{
+            try {
+                const data = jwt.verify(token,'secret_ecom'); // secret_ecom is the token name and created when the user is created 
+                                                             // verify  : function uses this secret key to check the integrity of the token.
+                req.user = data.user;
+                next();
+            } catch (error) {
+                res.status(401).send({errors:"Please authenticate using a valid token"})
+            }
+        }
+    }
+
+//Creatign the endpoint for adding products in cartdata
+app.post('/addtocart',fetchuser,async (req,res) => {
+    let uesrData = await Users.findOne({_id:req.user.id});
+    uesrData.cartData[req.body.itemId] += 1;
+    await Users.findOneAndUpdate({_id:req.user.id},{cartData:uesrData.cartData});
+    res.send("Added To The Cart");
+
+})
 
 // Schema for Creating the products
 
@@ -110,7 +154,7 @@ app.post('/signup',async (req,res) => {
     let check = await Users.findOne({email:req.body.email});
 
     if(check){
-        return res.status(400).json({success:false,erros:"existing user found with same email address"})
+        return res.status(400).json({success:false,errors:"existing user found with same email address"})
     }
 
     let cart = {};
@@ -118,10 +162,14 @@ app.post('/signup',async (req,res) => {
     {
         cart[i] = 0;
     }
+    let saltRound = 10;
+    let encryptPassowrd = await bcrypt.hash(req.body.password,saltRound);
+
+
     const user = new Users({
         name:req.body.username,
         email:req.body.email,
-        password:req.body.password,
+        password:encryptPassowrd,
         cartData:cart,
     })
 
@@ -133,7 +181,7 @@ app.post('/signup',async (req,res) => {
         }
     }
 
-    const token = jwt.sign(data,'secret_ecom');
+    const token = jwt.sign(data,'secret_ecom'); // 
     res.json({success:true,token});
 })
 
@@ -144,9 +192,11 @@ app.post('/login',async (req,res) => {
     console.log(req.body.password);
     let user = await Users.findOne({email:req.body.email});
     
+    const { password } = req.body;
+
     if(user){
         if(user.password){
-            const passCompare = req.body.password === user.password;
+            const passCompare = await bcrypt.compare(password,user.password)
             if(passCompare){
                 const data = {
                     user:{
