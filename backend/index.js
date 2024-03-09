@@ -82,6 +82,7 @@ app.get('/popularinwomen',async (req,res) => {
 
 //Creatign the endpoint for adding products in cartdata
 app.post('/addtocart',fetchuser,async (req,res) => {
+    console.log("Added",req.body.itemId);
     let uesrData = await Users.findOne({_id:req.user.id});
     uesrData.cartData[req.body.itemId] += 1;
     await Users.findOneAndUpdate({_id:req.user.id},{cartData:uesrData.cartData});
@@ -89,8 +90,26 @@ app.post('/addtocart',fetchuser,async (req,res) => {
 
 })
 
-// Schema for Creating the products
+//Creating the endpoint to remove product form the cartData
+app.post('/removefromcart',fetchuser,async (req,res) => {
+    console.log("Removed",req.body.itemId);
+    let uesrData = await Users.findOne({_id:req.user.id});
+    if(uesrData.cartData[req.body.itemId] > 0) {
+        uesrData.cartData[req.body.itemId] -= 1;
+    }
+    await Users.findOneAndUpdate({_id:req.user.id},{cartData:uesrData.cartData});
+    res.send("Added To The Cart");
+})
 
+//Creating the endpoint to get the cartData
+app.post('/getcart',fetchuser,async (req,res) => { // Here the fetchuser is used to get the userid from the database
+    console.log("Get Cart");
+    let userData = await Users.findOne({_id:req.user.id});
+    res.json(userData.cartData);
+
+})  
+
+// Schema for Creating the products
 const Product = mongoose.model("Product",{
     id: {
         type: Number,
