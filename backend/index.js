@@ -157,16 +157,6 @@ app.get("/",(req,res) => {
     res.send("Express App is Running");
 })
 
-// Image Storage Engine
-
-const storage = multer.diskStorage({
-    destination: './upload/images/',
-    filename:(req,file,cb) => {
-        return cb(null,`${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
-    }
-})
-
-const upload = multer({storage:storage})
 
 //Creating upload endpint for images
 
@@ -196,24 +186,6 @@ app.get('/popularinwomen',async (req,res) => {
     res.send(poular_in_women);
 })
 
-// Creating middleware to fetch the user
-// Fetchuser is a middleware funciton
-        const fetchuser = async (req,res,next) => {
-            const token = req.header('auth-token');
-            if(!token){
-                res.status(401).send({errors:"Please authenticate using valid token"})
-            }
-            else{
-                try {
-                    const data = jwt.verify(token,'secret_ecom'); // secret_ecom is the token name and created when the user is created 
-                                                                // verify  : function uses this secret key to check the integrity of the token.
-                    req.user = data.user;
-                    next();
-                } catch (error) {
-                    res.status(401).send({errors:"Please authenticate using a valid token"})
-                }
-            }
-        }
 
 //Creatign the endpoint for adding products in cartdata
 app.post('/addtocart',fetchuser,async (req,res) => {
@@ -225,8 +197,8 @@ app.post('/addtocart',fetchuser,async (req,res) => {
 })
 
 // Creating the endpoint for getting the name for the customer
-app.get('/getcustomername',fetchuser,(req,res) => {
-    res.send(getUserName);
+app.get('/getcustomername',(req,res) => {
+    res.send({  name : getUserName });
 })
 
 // Schema for Creating the products
@@ -280,6 +252,7 @@ app.post('/login',async (req,res) => {
     const { password } = req.body;
 
     if(user){
+        getUserName=user.name;
         console.log("The name is : ",getUserName);
         if(user.password){
             const passCompare = await bcrypt.compare(password,user.password)
