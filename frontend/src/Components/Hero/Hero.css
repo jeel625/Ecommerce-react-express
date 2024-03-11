@@ -4,6 +4,7 @@
     display: flex;
 }
 
+
 .hero-left{
     flex: 1;
     display: flex;
@@ -53,3 +54,37 @@
     align-items: center;
     justify-content: center;
 }
+
+
+
+
+
+@keyframes wordAnimation {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(0%);
+      opacity: 0;
+    }
+  }
+  
+  .word-animation-container {
+    overflow: hidden;
+    color: crimson; /* Hides the overflowing content */
+  }
+  
+  .word-animation {
+    display: inline-block;
+    white-space: nowrap; /* Prevents words from wrapping to the next line */
+    animation: wordAnimation 6s linear infinite;
+  }
+  
+  .word-animation span {
+    margin-right: 10px; /* Adjust the spacing between words */
+  }
+  

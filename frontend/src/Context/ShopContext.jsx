@@ -20,6 +20,7 @@ const ShopConetextProvider = (props) => {
 
     const [all_product,setAll_products] = useState([]);
     const [cartItems,setCartItems] = useState(getDefaultCart());
+    const [getCustomerName,setCutomerName] = useState(" ");
 
 
     //Fetching all the data from the database
@@ -27,6 +28,12 @@ const ShopConetextProvider = (props) => {
         fetch('http://localhost:4000/allproducts')
         .then((response) => response.json())
         .then((data) => setAll_products(data))
+
+        fetch('http://localhost:4000/getcustomername')
+        .then((res) => res.json())
+        .then((data) => setCutomerName(data));
+
+        console.log(getCustomerName);
     },[])
 
     const addToCart = (itemId) => {
@@ -49,6 +56,10 @@ const ShopConetextProvider = (props) => {
 
     const removeFromCart = (itemId) => {
         setCartItems((prev) => ({...prev,[itemId] : prev[itemId]-1})) 
+    }
+
+    const getName = async () => {
+        return getCustomerName;
     }
 
     const getTotalCartAmount = () => {
@@ -77,7 +88,7 @@ const ShopConetextProvider = (props) => {
         return totalItem;
     }
 
-    const contextValue = { getTotalCartItems,getTotalCartAmount,all_product,cartItems,addToCart,removeFromCart };
+    const contextValue = { getTotalCartItems,getTotalCartAmount,all_product,cartItems,addToCart,removeFromCart,getName };
 
 
     return(
