@@ -4,7 +4,7 @@ import '../CartItems/CartItems.css';
 import { ShopContext } from '../../Context/ShopContext';
 
 export const CartItems = () => {
-    const { getTotalCartAmount,all_product, cartItems, removeFromCart } = useContext(ShopContext);
+    const { getTotalCartAmount,allProduct, cartItems, removeFromCart } = useContext(ShopContext);
 
     return (
         <div className='cartitems'>
@@ -17,8 +17,9 @@ export const CartItems = () => {
                 <p>Remove</p>
             </div>
             <hr />
-            {all_product.map((e) => {
+            {allProduct.map((e) => {
                 if (cartItems[e.id] > 0) {
+                  console.log("The cart id inside condition is : ",e.id);
                     return (
                         <div key={e.id}>
                             <div className="cartitems-format cartitem-format-main">

@@ -196,6 +196,24 @@ app.post('/addtocart',fetchuser,async (req,res) => {
 
 })
 
+//Creating the endpoint for removing the product from the cartData
+app.post('/removefromcart',fetchuser,async (req,res) => {
+    let uesrData = await Users.findOne({_id:req.user.id});
+    uesrData.cartData[req.body.itemId] -= 1;
+    await Users.findOneAndUpdate({_id:req.user.id},{cartData:uesrData.cartData});
+    res.send("Added To The Cart");
+
+})
+
+//Creating the endpoint to get the the cart from the database.
+app.post('/getcart',fetchuser,async (req,res) => {
+    console.log("Get Cart");
+    let userData = await Users.findOne({_id:req.user.id});
+    console.log(userData.cartData);
+    res.json(userData.cartData);
+})
+
+
 // Creating the endpoint for getting the name for the customer
 app.get('/getcustomername',(req,res) => {
     res.send({  name : getUserName });

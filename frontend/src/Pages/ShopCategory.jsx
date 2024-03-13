@@ -7,7 +7,7 @@ import Item from '../Components/Item/Item';
 
 
 export const ShopCategory = (props) => {
-  const { all_product } = useContext(ShopContext);
+  const { allProduct } = useContext(ShopContext);
 
   return (
     <div className='shop-category'>
@@ -21,7 +21,7 @@ export const ShopCategory = (props) => {
         </div>
       </div>
       <div className="shopcategory-products">
-        {all_product.map((item, i) => {
+        {allProduct.map((item, i) => {
           console.log(item);
           if (props.category===item.category) {
             
