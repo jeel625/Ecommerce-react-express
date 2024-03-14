@@ -1,7 +1,6 @@
 import React,{ useState,useEffect } from 'react'
 import './Popular.css'
 import { Item } from '../Item/Item'
-import { useActionData } from 'react-router-dom'
 
 export const Popular = () => {
 
